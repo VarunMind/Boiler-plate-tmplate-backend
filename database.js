@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import { EnvConfig } from "./config/EnvConfig.js";
 
-export default function connectToDatabase() {
+export default async function connectToDatabase() {
   const db_url = EnvConfig.MONGO_DB_CONNECTION_URL;
 
   try {
-    mongoose.connect(db_url, {
+    await mongoose.connect(db_url, {
       serverSelectionTimeoutMS: 5000,
       tls: true,
       tlsAllowInvalidCertificates: false,
