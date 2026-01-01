@@ -15,7 +15,7 @@ const Cors_Config = {
   credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE"],
 };
-app.options("*", cors(Cors_Config));
+
 app.use(cors(Cors_Config));
 
 app.use(express.json());
