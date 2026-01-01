@@ -10,15 +10,17 @@ const PORT = 300;
 
 connectToDatabase();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 const Cors_Config = {
   origin: "*",
-  credentials: true,
+  credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE"],
 };
-app.options("", cors(Cors_Config));
+app.options("*", cors(Cors_Config));
 app.use(cors(Cors_Config));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 app.get("/", (request, response) => {
   response.send({

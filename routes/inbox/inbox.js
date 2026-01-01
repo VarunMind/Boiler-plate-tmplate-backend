@@ -345,138 +345,138 @@ InboxRouter.put(
   }
 );
 
-InboxRouter.put(
-  "/inbox/favourite",
-  [query("id")],
-  tokenVerifier,
-  async (req, res) => {
-    try {
-      const id = req.query.id;
+  InboxRouter.put(
+    "/inbox/favourite",
+    [query("id")],
+    tokenVerifier,
+    async (req, res) => {
+      try {
+        const id = req.query.id;
 
-      const user = await User.findById(req.user_id).select("-password");
+        const user = await User.findById(req.user_id).select("-password");
 
-      if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: "Employee Dose Not Exist",
-        });
-      }
-
-      const rowData = await fs.readFile("data/emails.json", "utf-8");
-      const allEmails = JSON.parse(rowData);
-
-      const updatedMails = allEmails?.map((email) => {
-        if (email?.id === id) {
-          return {
-            ...email,
-            isStarred: !email?.isStarred,
-          };
+        if (!user) {
+          return res.status(400).json({
+            success: false,
+            message: "Employee Dose Not Exist",
+          });
         }
 
-        return email;
-      });
+        const rowData = await fs.readFile("data/emails.json", "utf-8");
+        const allEmails = JSON.parse(rowData);
 
-      await fs.writeFile(
-        "data/emails.json",
-        JSON.stringify(updatedMails, null, 2),
-        "utf-8"
-      );
+        const updatedMails = allEmails?.map((email) => {
+          if (email?.id === id) {
+            return {
+              ...email,
+              isStarred: !email?.isStarred,
+            };
+          }
 
-      const starredMails = updatedMails.filter(
-        (item) => item?.isStarred
-      )?.length;
+          return email;
+        });
 
-      return res.status(200).json({
-        message: "Emails Favorite Successfully",
-        success: true,
-        data: {
-          starred: starredMails,
-        },
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error While Fetching Mails",
-        success: true,
-        error: String(error),
-      });
-    }
-  }
-);
+        await fs.writeFile(
+          "data/emails.json",
+          JSON.stringify(updatedMails, null, 2),
+          "utf-8"
+        );
 
-InboxRouter.put(
-  "/inbox/restore",
-  [body("selectedIds")?.isArray()],
-  tokenVerifier,
-  async (req, res) => {
-    try {
-      const result = validationResult(req);
-      if (!result.isEmpty()) {
-        return res.status(400).json({ result });
-      }
-      const { selectedIds } = req.body;
+        const starredMails = updatedMails.filter(
+          (item) => item?.isStarred
+        )?.length;
 
-      const user = await User.findById(req.user_id).select("-password");
-
-      if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: "Employee Dose Not Exist",
+        return res.status(200).json({
+          message: "Emails Favorite Successfully",
+          success: true,
+          data: {
+            starred: starredMails,
+          },
+        });
+      } catch (error) {
+        return res.status(500).json({
+          message: "Error While Fetching Mails",
+          success: true,
+          error: String(error),
         });
       }
+    }
+  );
 
-      const rowData = await fs.readFile("data/emails.json", "utf-8");
-      const allEmails = JSON.parse(rowData);
+  InboxRouter.put(
+    "/inbox/restore",
+    [body("selectedIds")?.isArray()],
+    tokenVerifier,
+    async (req, res) => {
+      try {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+          return res.status(400).json({ result });
+        }
+        const { selectedIds } = req.body;
 
-      const updatedMails = allEmails?.map((email) => {
-        if (selectedIds?.includes(email?.id)) {
-          return {
-            ...email,
-            isDeleted: false,
-          };
+        const user = await User.findById(req.user_id).select("-password");
+
+        if (!user) {
+          return res.status(400).json({
+            success: false,
+            message: "Employee Dose Not Exist",
+          });
         }
 
-        return email;
-      });
+        const rowData = await fs.readFile("data/emails.json", "utf-8");
+        const allEmails = JSON.parse(rowData);
 
-      await fs.writeFile(
-        "data/emails.json",
-        JSON.stringify(updatedMails, null, 2),
-        "utf-8"
-      );
+        const updatedMails = allEmails?.map((email) => {
+          if (selectedIds?.includes(email?.id)) {
+            return {
+              ...email,
+              isDeleted: false,
+            };
+          }
 
-      const totalMails = updatedMails?.length;
-      const deletedMails = updatedMails.filter(
-        (item) => item?.isDeleted
-      )?.length;
-      const starredMails = updatedMails.filter(
-        (item) => item?.isStarred && !item.isDeleted
-      )?.length;
-      const importantMails = updatedMails.filter(
-        (item) => item?.isImportant && !item.isDeleted
-      )?.length;
+          return email;
+        });
 
-      return res.status(200).json({
-        message: "Emails Restored Successfully",
-        success: true,
-        data: {
-          mails: totalMails - deletedMails,
-          starred: starredMails,
-          sent: 0,
-          draft: 0,
-          spam: 0,
-          important: importantMails,
-          bin: deletedMails,
-        },
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error While Fetching Mails",
-        success: true,
-        error: String(error),
-      });
+        await fs.writeFile(
+          "data/emails.json",
+          JSON.stringify(updatedMails, null, 2),
+          "utf-8"
+        );
+
+        const totalMails = updatedMails?.length;
+        const deletedMails = updatedMails.filter(
+          (item) => item?.isDeleted
+        )?.length;
+        const starredMails = updatedMails.filter(
+          (item) => item?.isStarred && !item.isDeleted
+        )?.length;
+        const importantMails = updatedMails.filter(
+          (item) => item?.isImportant && !item.isDeleted
+        )?.length;
+
+        return res.status(200).json({
+          message: "Emails Restored Successfully",
+          success: true,
+          data: {
+            mails: totalMails - deletedMails,
+            starred: starredMails,
+            sent: 0,
+            draft: 0,
+            spam: 0,
+            important: importantMails,
+            bin: deletedMails,
+          },
+        });
+      } catch (error) {
+        return res.status(500).json({
+          message: "Error While Fetching Mails",
+          success: true,
+          error: String(error),
+        });
+      }
     }
-  }
-);
+  );
 
 InboxRouter.get(
   "/inbox/message/fetch",
