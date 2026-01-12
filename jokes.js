@@ -17,7 +17,7 @@ const jenerateJoks = async () => {
   let generatedJokes = [];
 
   for (const item of allEmails) {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i <3; i++) {
       const joke = await fetchRandomJoke();
       const jokeId = uuidv4();
 
